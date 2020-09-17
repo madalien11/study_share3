@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'edit_profile_screen.dart';
-import 'change_email_screen.dart';
 import 'change_password_screen.dart';
-import 'package:kindainternship/screens/update_profile_photo.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const String id = 'settings_screen';
@@ -51,32 +49,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: double.infinity,
                 height: 2,
                 color: Colors.grey.withOpacity(0.4)),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, UpdateProfilePhoto.id);
-              },
-              child: ListTile(
-                title: Text('Update profile photo'),
-                trailing: Icon(Icons.chevron_right, size: num30),
-              ),
-            ),
-            Container(
-                width: double.infinity,
-                height: 2,
-                color: Colors.grey.withOpacity(0.4)),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, ChangeEmailScreen.id);
-              },
-              child: ListTile(
-                title: Text('Change email'),
-                trailing: Icon(Icons.chevron_right, size: num30),
-              ),
-            ),
-            Container(
-                width: double.infinity,
-                height: 2,
-                color: Colors.grey.withOpacity(0.4)),
+//            GestureDetector(
+//              onTap: () {
+//                Navigator.pushNamed(context, UpdateProfilePhoto.id);
+//              },
+//              child: ListTile(
+//                title: Text('Update profile photo'),
+//                trailing: Icon(Icons.chevron_right, size: num30),
+//              ),
+//            ),
+//            Container(
+//                width: double.infinity,
+//                height: 2,
+//                color: Colors.grey.withOpacity(0.4)),
+//            GestureDetector(
+//              onTap: () {
+//                Navigator.pushNamed(context, ChangeEmailScreen.id);
+//              },
+//              child: ListTile(
+//                title: Text('Change email'),
+//                trailing: Icon(Icons.chevron_right, size: num30),
+//              ),
+//            ),
+//            Container(
+//                width: double.infinity,
+//                height: 2,
+//                color: Colors.grey.withOpacity(0.4)),
             GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, ChangePasswordScreen.id);

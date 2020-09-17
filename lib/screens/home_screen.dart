@@ -1,10 +1,33 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'search_screen.dart';
-import 'add_question_screen.dart';
 import 'package:kindainternship/data/data.dart';
 import '../components/custom_question_widget.dart';
 import 'package:kindainternship/data/list_of_data.dart';
+
+String imageUrl;
+
+class Question {
+  final int id;
+  final String title;
+  final String description;
+  final DateTime pubDate;
+  final int likes;
+  final int dislikes;
+  final int answerCount;
+  final bool userVote;
+  final String imageUrl;
+  final int nextPage;
+  Question(
+      {@required this.id,
+      @required this.title,
+      @required this.description,
+      this.pubDate,
+      this.likes = 0,
+      this.dislikes = 0,
+      this.answerCount,
+      this.userVote,
+      this.imageUrl,
+      this.nextPage});
+}
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -14,68 +37,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-//  List<CustomQuestionWidget> mainScreenQuestions = [
-////    CustomQuestionWidget(
-////      id: 111,
-////      title:
-////          'Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est?',
-////      description: 'no idea',
-////      likes: 10,
-////      subjectName: 'Others',
-////      username: 'admin',
-////    ),
-////    CustomQuestionWidget(
-////      id: 222,
-////      title:
-////          'Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est?',
-////      description: 'no idea',
-////      subjectName: 'Others',
-////      username: 'admin',
-////    ),
-////    CustomQuestionWidget(
-////      id: 333,
-////      title:
-////          'Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? ',
-////      description: 'no idea',
-////      subjectName: 'Others',
-////      username: 'admin',
-////    ),
-////    CustomQuestionWidget(
-////      id: 444,
-////      title:
-////          'Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est?',
-////      description: 'no idea',
-////      subjectName: 'Others',
-////      username: 'admin',
-////    ),
-////    CustomQuestionWidget(
-////      id: 555,
-////      title:
-////          'Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est?',
-////      description: 'no idea',
-////      subjectName: 'Others',
-////      username: 'admin',
-////    ),
-////    CustomQuestionWidget(
-////      id: 666,
-////      title:
-////          'Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est? Orci iaculis et sed ut viverra est. Orci iaculis et sed ut viverra est?',
-////      description: 'no idea',
-////      subjectName: 'Others',
-////      username: 'admin',
-////    ),
-//  ];
+  Future<List<Question>> futureListOfQuestions;
+  int nextPage = 2;
+  bool isLoading = false;
+  var _controller = ScrollController();
 
-  String imageUrl = '';
-  void newState() {
-    print('newState');
-    setState(() {});
+  Future _loadData(newPage) async {
+    print('new page');
+    await allQs(context, newPage);
+    print(mainScreenQuestions);
+    setState(() {
+      isLoading = false;
+//      mainScreenQuestions.addAll(['new item']);
+    });
   }
 
   void subjects() async {
     var outcome = await Subjects().getData();
     if (outcome != null) {
-      List subjectList = outcome['data']['subject'];
+      List subjectList = outcome['data'];
       for (int i = 0; i < subjectList.length; i++) {
         subjectMap
             .addAll({subjectList[i]['name']: subjectList[i]['id'].toString()});
@@ -86,28 +66,79 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  List<CustomQuestionWidget> listOfQuestions(context) {
-    allQs(context);
+  @override
+  initState() {
+    super.initState();
+    subjects();
+    listOfQuestions(context, 1);
+    futureListOfQuestions = fetchQuestion(context, 1);
+    _controller.addListener(() {
+      if (_controller.position.atEdge) {
+        if (_controller.position.pixels == 0) {
+          print('// you are at top position');
+        } else {
+          // you are at bottom position
+          _loadData(nextPage);
+          // start loading data
+          setState(() {
+            isLoading = true;
+          });
+        }
+      }
+    });
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+    mainScreenQuestions.clear();
+    futureListOfQuestions = null;
+  }
+
+  List<CustomQuestionWidget> listOfQuestions(context, newPage) {
+    allQs(context, newPage);
     return mainScreenQuestions;
   }
 
-  void allQs(context) async {
-    dynamic data = await AllQuestions(context: context).getData();
+  List<CustomQuestionWidget> listViewBuilder(snapshot, index) {
+//    mainScreenQuestions.clear();
+    CustomQuestionWidget element = CustomQuestionWidget(
+      id: snapshot.data[index].id,
+      title: snapshot.data[index].title,
+      description: snapshot.data[index].description,
+      pubDate: snapshot.data[index].pubDate,
+      likes: snapshot.data[index].likes,
+      dislikes: snapshot.data[index].dislikes,
+      userVote: snapshot.data[index].userVote,
+      imageUrl: snapshot.data[index].imageUrl,
+      answerCount: snapshot.data[index].answerCount,
+    );
+    if (!mainScreenQuestions.contains(element)) {
+      mainScreenQuestions.add(element);
+    }
+    return mainScreenQuestions;
+  }
+
+  Future allQs(context, page) async {
+    dynamic data = await AllQuestions(context: context, page: page).getData();
     if (data != null) {
       List questionsList = data['data']['questions'];
       if (!mounted) return;
       setState(() {
+        nextPage = data['data']['next'];
         for (int i = 0; i < questionsList.length; i++) {
-          imageUrl = 'http://api.study-share.info' +
-              questionsList[i]['image'][0]['path'];
+          if (questionsList[i]['image'].length > 0) {
+            imageUrl = 'http://api.study-share.info' +
+                questionsList[i]['image'][0]['path'];
+          }
           mainScreenQuestions.add(
             CustomQuestionWidget(
               id: questionsList[i]['id'].toInt(),
               title: questionsList[i]['title'],
               description: questionsList[i]['description'],
-              pubDate: DateTime.parse(
-                  questionsList[i]['pub_date'].toString().substring(0, 19) +
-                      'Z'),
+              pubDate: DateTime.parse(questionsList[i]['pub_date_original']
+                  .toString()
+                  .substring(0, 19)),
               likes: questionsList[i]['likes'],
               dislikes: questionsList[i]['dislikes'],
               userVote: questionsList[i]['user_vote'],
@@ -119,23 +150,21 @@ class _HomeScreenState extends State<HomeScreen> {
 //              subjectRating: questionsList[i]['subject']['rating'],
               imageUrl: imageUrl,
               answerCount: questionsList[i]['answer_count'],
-              newState: newState,
             ),
           );
+          imageUrl = null;
         }
       });
     }
-    subjects();
   }
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
 
   Future<Null> _refresh() {
-    mainScreenQuestions = [];
-    subjects();
-    return AllQuestions(context: context).getData().then((map) {
-      setState(() => listOfQuestions(context));
+    mainScreenQuestions.clear();
+    return AllQuestions(context: context, page: 1).getData().then((map) {
+      setState(() => listOfQuestions(context, 1));
     });
   }
 
@@ -148,92 +177,43 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Study Share',
+          'StudyShare',
           style: TextStyle(
             color: Colors.black,
           ),
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            color: Colors.black,
-            onPressed: () {
-              Navigator.pushNamed(context, SearchScreen.id);
-            },
-          ),
-        ],
         backgroundColor: Colors.white,
       ),
       body: RefreshIndicator(
-        onRefresh: _refresh,
-        color: Color(0xffFF7A00),
-        key: _refreshIndicatorKey,
-        child: ListView(
-          padding: EdgeInsets.only(
-              left: num10, top: num20, right: num10, bottom: num40),
-          children: <Widget>[
-            Column(
-              children: listOfQuestions(context),
-            )
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.pushNamed(context, AddQuestionScreen.id,
-              arguments: {'questions': mainScreenQuestions});
-        },
-        backgroundColor: Color(0xFFFF7A00),
-        tooltip: 'Add a new question',
-        icon: Icon(Icons.add),
-        label: Text('QUESTION'),
-      ),
+          onRefresh: _refresh,
+          color: Color(0xffFF7A00),
+          key: _refreshIndicatorKey,
+          child: FutureBuilder<List<Question>>(
+            future: futureListOfQuestions == null
+                ? fetchQuestion(context, 1)
+                : futureListOfQuestions,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
+                  controller: _controller,
+                  padding: EdgeInsets.only(
+                      left: num10, top: num20, right: num10, bottom: num40),
+                  children: <Widget>[Column(children: mainScreenQuestions)],
+//                  c: (context, index) {
+//                    return ;
+//                  },
+//                  itemCount: snapshot.data.length,
+                );
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
+
+              // By default, show a loading spinner.
+              return Center(
+                  child: CircularProgressIndicator(
+                      backgroundColor: Color(0xffFF7A00)));
+            },
+          )),
     );
   }
 }
-
-//import 'questions_screen.dart';
-//import 'leaders_screen.dart';
-//import 'profile_screen.dart';
-//int _currentIndex = 0;
-//final _items = [
-//  BottomNavigationBarItem(
-//    icon: Icon(Icons.home),
-//    title: Text('Main'),
-//  ),
-//  BottomNavigationBarItem(
-//    icon: Icon(Icons.question_answer),
-//    title: Text('Questions'),
-//  ),
-//  BottomNavigationBarItem(
-//    icon: Icon(Icons.group),
-//    title: Text('Leaders'),
-//  ),
-//  BottomNavigationBarItem(
-//    icon: Icon(Icons.person),
-//    title: Text('Profile'),
-//  ),
-//];
-//static final _screens = [
-//  HomeScreen.id,
-//  QuestionsScreen.id,
-//  LeadersScreen.id,
-//  ProfileScreen.id
-//];
-//      bottomNavigationBar: BottomNavigationBar(
-//        selectedItemColor: Color(0xFFFF7A00),
-//        type: BottomNavigationBarType.fixed,
-//        backgroundColor: Colors.white,
-//        items: _items,
-//        currentIndex: 0,
-//        onTap: (index) {
-//          setState(() {
-//            _currentIndex = index;
-//            if (_currentIndex != 0) {
-//              Navigator.pop(context);
-//              Navigator.pushNamed(context, _screens[_currentIndex]);
-//            }
-//          });
-//        },
-//      ),

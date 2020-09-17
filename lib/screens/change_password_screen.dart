@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_password_strength/flutter_password_strength.dart';
 import 'package:kindainternship/data/data.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -15,10 +16,51 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   String currentPassword;
   String newPassword;
   String confirmPassword;
+  bool hideCurrent = true;
+  bool hidePass = true;
+  bool hideConfirm = true;
+  Animatable<Color> strengthColors;
+  double passStrength = -1;
+
+  Animatable<Color> get _strengthColors => strengthColors != null
+      ? strengthColors
+      : TweenSequence<Color>(
+          [
+            TweenSequenceItem(
+              weight: 1.0,
+              tween: ColorTween(
+                begin: Colors.red,
+                end: Colors.yellow,
+              ),
+            ),
+            TweenSequenceItem(
+              weight: 1.0,
+              tween: ColorTween(
+                begin: Colors.yellow,
+                end: Colors.green,
+              ),
+            ),
+          ],
+        );
+
+  Widget checkPass(double str) {
+    if (0.0 < str && str < 0.33) {
+      return Text('weak', style: TextStyle(color: Colors.red));
+    } else if (0.33 < str && str < 0.67) {
+      return Text('normal', style: TextStyle(color: Colors.yellow));
+    } else if (0.67 < str && str < 1.0) {
+      return Text('strong', style: TextStyle(color: Colors.green));
+    }
+    return Container();
+  }
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double wNum18 = width * 0.048;
+    double wNum16 = width * 0.0427;
+    double wNum22 = width * 0.0587;
     double num10 = height * 0.0142;
     double num15 = height * 0.0212;
     double num16 = height * 0.0227;
@@ -66,15 +108,31 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       child: TextField(
                         autofocus: false,
                         controller: currentPassTextController,
-                        obscureText: true,
+                        obscureText: hideCurrent,
                         onChanged: (value) {
                           currentPassword = value;
                         },
                         decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                hideCurrent = !hideCurrent;
+                              });
+                            },
+                            icon: hideCurrent
+                                ? Icon(
+                                    Icons.visibility,
+                                    color: Color(0xff828282),
+                                  )
+                                : Icon(
+                                    Icons.visibility_off,
+                                    color: Color(0xff828282),
+                                  ),
+                          ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: num10, vertical: num10),
                           hintText: 'Current password',
-                          hintStyle: TextStyle(fontSize: num16),
+                          hintStyle: TextStyle(fontSize: wNum16),
                           border: InputBorder.none,
                         ),
                       ),
@@ -89,19 +147,47 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       child: TextField(
                         autofocus: false,
                         controller: newPassTextController,
-                        obscureText: true,
+                        obscureText: hidePass,
                         onChanged: (value) {
-                          newPassword = value;
+                          setState(() {
+                            newPassword = value;
+                          });
                         },
                         decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                hidePass = !hidePass;
+                              });
+                            },
+                            icon: hidePass
+                                ? Icon(
+                                    Icons.visibility,
+                                    color: Color(0xff828282),
+                                  )
+                                : Icon(
+                                    Icons.visibility_off,
+                                    color: Color(0xff828282),
+                                  ),
+                          ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: num10, vertical: num10),
                           hintText: 'New password',
-                          hintStyle: TextStyle(fontSize: num16),
+                          hintStyle: TextStyle(fontSize: wNum16),
                           border: InputBorder.none,
                         ),
                       ),
                     ),
+                    Padding(
+                        padding: EdgeInsets.only(top: num15 - 3),
+                        child: FlutterPasswordStrength(
+                          strengthColors: _strengthColors,
+                          password: newPassword,
+                          strengthCallback: (strength) {
+                            passStrength = strength;
+                          },
+                        )),
+                    checkPass(passStrength),
                     SizedBox(height: num10),
                     Container(
                       decoration: BoxDecoration(
@@ -112,15 +198,33 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       child: TextField(
                         autofocus: false,
                         controller: confirmPassTextController,
-                        obscureText: true,
+                        obscureText: hideConfirm,
                         onChanged: (value) {
-                          confirmPassword = value;
+                          setState(() {
+                            confirmPassword = value;
+                          });
                         },
                         decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                hideConfirm = !hideConfirm;
+                              });
+                            },
+                            icon: hideConfirm
+                                ? Icon(
+                                    Icons.visibility,
+                                    color: Color(0xff828282),
+                                  )
+                                : Icon(
+                                    Icons.visibility_off,
+                                    color: Color(0xff828282),
+                                  ),
+                          ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: num10, vertical: num10),
                           hintText: 'Confirm new password',
-                          hintStyle: TextStyle(fontSize: num16),
+                          hintStyle: TextStyle(fontSize: wNum16),
                           border: InputBorder.none,
                         ),
                       ),
@@ -150,7 +254,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           child: Text(
                             'SAVE',
                             style: TextStyle(
-                                fontSize: num18,
+                                fontSize: wNum18,
                                 color: Colors.white,
                                 letterSpacing: 3),
                           )),

@@ -1,32 +1,32 @@
 List sliderItems = [
   {
-    "header": "Learn",
+    "header": "Main",
     "description":
-        "Online chat which provides its users maximum functionality to simplify the search",
-    "image": "images/icon.png"
+        "Monitor all updated questions regarding your chosen subjects",
+    "image": "images/Home.png"
   },
   {
-    "header": "Build",
+    "header": "Search",
     "description":
-        "Online chat which provides its users maximum functionality to simplify the search",
-    "image": "images/matejko.jpg"
+        "Find answers to various questions from different categories",
+    "image": "images/Search.png"
   },
   {
-    "header": "Launch",
+    "header": "Add Question",
     "description":
-        "Online chat which provides its users maximum functionality to simplify the search",
-    "image": "images/shot1.png"
+        "In case you could not find the answer to the question you can always post it in our application and other users will share with you their answers =)",
+    "image": "images/Add.png"
   },
   {
-    "header": "Invest",
+    "header": "Leaders",
     "description":
-        "Online chat which provides its users maximum functionality to simplify the search",
-    "image": "images/shot2.png"
+        "Observe users with the highest scores and try to compete with them",
+    "image": "images/Leaders.png"
   },
   {
-    "header": "Travel",
+    "header": "Profile",
     "description":
-        "Online chat which provides its users maximum functionality to simplify the search",
-    "image": "images/shot3.png"
+        "On this page, you can check your history of answers and questions, personalize all settings for your comfort, and get more information about the ranking system.",
+    "image": "images/Profile.png"
   }
 ];

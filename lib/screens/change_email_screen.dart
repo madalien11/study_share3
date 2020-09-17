@@ -14,6 +14,10 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double wNum18 = width * 0.048;
+    double wNum16 = width * 0.0427;
+    double wNum22 = width * 0.0587;
     double num10 = height * 0.0142;
     double num15 = height * 0.0212;
     double num16 = height * 0.0227;
@@ -68,7 +72,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: num10, vertical: num10),
                           hintText: 'Email',
-                          hintStyle: TextStyle(fontSize: num16),
+                          hintStyle: TextStyle(fontSize: wNum16),
                           border: InputBorder.none,
                         ),
                       ),
@@ -90,7 +94,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                           child: Text(
                             'SAVE',
                             style: TextStyle(
-                                fontSize: num18,
+                                fontSize: wNum18,
                                 color: Colors.white,
                                 letterSpacing: 3),
                           )),

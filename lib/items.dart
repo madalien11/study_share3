@@ -1,6 +1,6 @@
 List items = [
   {
-    "header": "Study Share",
+    "header": "StudyShare",
     "description":
         "Online application for Q/A and some other related stuff, idk",
     "image": "images/icon.png",

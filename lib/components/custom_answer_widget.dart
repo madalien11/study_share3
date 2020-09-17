@@ -7,7 +7,7 @@ List<int> listId = [];
 class CustomAnswerWidget extends StatefulWidget {
   final int id;
   final String answer;
-  final DateTime pubDate;
+//  final DateTime pubDate;
   final bool isAuthor;
   final int likes;
   final int dislikes;
@@ -19,7 +19,7 @@ class CustomAnswerWidget extends StatefulWidget {
   CustomAnswerWidget({
     @required this.id,
     @required this.answer,
-    this.pubDate,
+//    this.pubDate,
     this.isAuthor,
     this.likes = 0,
     this.dislikes = 0,
@@ -54,6 +54,10 @@ class _CustomAnswerWidgetState extends State<CustomAnswerWidget> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double wNum18 = width * 0.048;
+    double wNum14 = width * 0.0373;
+    double wNum22 = width * 0.0587;
     double num7 = height * 0.0099;
     double num12 = height * 0.0170;
     double num14 = height * 0.0198;
@@ -83,7 +87,7 @@ class _CustomAnswerWidgetState extends State<CustomAnswerWidget> {
                     widget.username,
                     style: TextStyle(
                         color: Colors.black,
-                        fontSize: num18,
+                        fontSize: wNum18,
                         fontWeight: FontWeight.w300),
                   ),
                 ],
@@ -91,7 +95,7 @@ class _CustomAnswerWidgetState extends State<CustomAnswerWidget> {
               SizedBox(height: num12),
               Text(
                 widget.answer,
-                style: TextStyle(color: Colors.black, fontSize: num18),
+                style: TextStyle(color: Colors.black, fontSize: wNum18),
               ),
               SizedBox(height: num12),
               Row(
@@ -153,7 +157,7 @@ class _CustomAnswerWidgetState extends State<CustomAnswerWidget> {
                       likes1 == null
                           ? widget.likes.toString()
                           : likes1.toString(),
-                      style: TextStyle(color: Colors.grey, fontSize: num14),
+                      style: TextStyle(color: Colors.grey, fontSize: wNum14),
                     ),
                   ),
                   SizedBox(width: num15),
@@ -213,7 +217,7 @@ class _CustomAnswerWidgetState extends State<CustomAnswerWidget> {
                       dislikes1 == null
                           ? widget.dislikes.toString()
                           : dislikes1.toString(),
-                      style: TextStyle(color: Colors.grey, fontSize: num14),
+                      style: TextStyle(color: Colors.grey, fontSize: wNum14),
                     ),
                   ),
                 ],

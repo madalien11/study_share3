@@ -9,7 +9,7 @@ import 'screens/single_question_screen.dart';
 import 'screens/add_question_screen.dart';
 import 'screens/my_questions.dart';
 import 'screens/my_answers.dart';
-import 'screens/my_topic.dart';
+import 'screens/my_subjects.dart';
 import 'screens/settings_screen.dart';
 import 'screens/edit_profile_screen.dart';
 import 'screens/change_email_screen.dart';
@@ -28,9 +28,15 @@ import 'dart:async';
 import 'package:kindainternship/data/data.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'slider_items.dart';
+import 'package:kindainternship/screens/search_filter_result.dart';
+import 'package:kindainternship/logout.dart';
+import 'screens/instructions.dart';
+import 'package:flutter/services.dart';
 
-enum _Actions { deleteAll }
-enum _ItemActions { delete, edit }
+//enum _Actions { deleteAll }
+//enum _ItemActions { delete, edit }
+LogOut signOut;
+AddTokenClass addTokenIns;
 
 //class ItemsWidget extends StatefulWidget {
 //  @override
@@ -156,34 +162,34 @@ enum _ItemActions { delete, edit }
 //
 //}
 
-class _EditItemWidget extends StatelessWidget {
-  _EditItemWidget(String text)
-      : _controller = TextEditingController(text: text);
-
-  final TextEditingController _controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Edit item'),
-      content: TextField(
-        key: Key('title_field'),
-        controller: _controller,
-        autofocus: true,
-      ),
-      actions: <Widget>[
-        FlatButton(
-            key: Key('cancel'),
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel')),
-        FlatButton(
-            key: Key('save'),
-            onPressed: () => Navigator.of(context).pop(_controller.text),
-            child: Text('Save')),
-      ],
-    );
-  }
-}
+//class _EditItemWidget extends StatelessWidget {
+//  _EditItemWidget(String text)
+//      : _controller = TextEditingController(text: text);
+//
+//  final TextEditingController _controller;
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return AlertDialog(
+//      title: Text('Edit item'),
+//      content: TextField(
+//        key: Key('title_field'),
+//        controller: _controller,
+//        autofocus: true,
+//      ),
+//      actions: <Widget>[
+//        FlatButton(
+//            key: Key('cancel'),
+//            onPressed: () => Navigator.of(context).pop(),
+//            child: Text('Cancel')),
+//        FlatButton(
+//            key: Key('save'),
+//            onPressed: () => Navigator.of(context).pop(_controller.text),
+//            child: Text('Save')),
+//      ],
+//    );
+//  }
+//}
 
 class SecItem {
   SecItem(this.key, this.value);
@@ -202,12 +208,13 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
         HomeScreen.id: (context) => HomeScreen(),
         MyAnswersPage.id: (context) => MyAnswersPage(),
-        MyTopicPage.id: (context) => MyTopicPage(),
+        MySubjects.id: (context) => MySubjects(),
         MyQuestionsPage.id: (context) => MyQuestionsPage(),
         ChangeEmailScreen.id: (context) => ChangeEmailScreen(),
         EditProfileScreen.id: (context) => EditProfileScreen(),
@@ -230,11 +237,13 @@ class MyApp extends StatelessWidget {
         ForgotPasswordChange.id: (context) => ForgotPasswordChange(),
         SliderScreen.id: (context) => SliderScreen(),
         WelcomeScreen.id: (context) => WelcomeScreen(),
+        SearchFilterResult.id: (context) => SearchFilterResult(),
+        InstructionsScreen.id: (context) => InstructionsScreen(),
       },
 //      initialRoute: LoginScreen.id,
-      title: 'Study Share',
+      title: 'StudyShare',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.amber,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: WelcomeScreen(),
@@ -256,26 +265,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   double currentPage = 0.0;
   final _pageViewController = new PageController();
   final _storage = FlutterSecureStorage();
-  List<SecItem> tokenItems = [];
-
-//  void subjects() async {
-//    var outcome = await Subjects().getData();
-//    print(outcome);
-//    List subjectList = outcome['data']['subject'];
-//    for (int i = 0; i < subjectList.length; i++) {
-//      subjectMap
-//          .addAll({subjectList[i]['name']: subjectList[i]['id'].toString()});
-//      subjectNameList.add(subjectList[i]['name']);
-//    }
-//  }
+  var tokenItems = [];
+  String imageUrl;
 
   @override
   void initState() {
+    super.initState();
+    signOut = LogOut(deleteAll: deleteAll);
+    addTokenIns = AddTokenClass(addTokenClass: addNewItem);
+    logOutInData = signOut.deleteAll;
+    addTokenInData = addTokenIns.addTokenClass;
     _readAll();
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 3), () {
       delayer(context);
     });
-    super.initState();
 //    _readLaunch();
   }
 
@@ -305,15 +308,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               fontWeight: FontWeight.w400,
                               color: Color(0XFF3F3D56),
                               height: 2.0)),
-                      Text(
-                        item['description'],
-                        style: TextStyle(
-                            color: Colors.grey,
-                            letterSpacing: 1.2,
-                            fontSize: num16,
-                            height: 1.3),
-                        textAlign: TextAlign.center,
-                      ),
+//                      Text(
+//                        item['description'],
+//                        style: TextStyle(
+//                            color: Colors.grey,
+//                            letterSpacing: 1.2,
+//                            fontSize: num16,
+//                            height: 1.3),
+//                        textAlign: TextAlign.center,
+//                      ),
                     ],
                   ),
                 ),
@@ -348,8 +351,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           )))
       .toList();
 
-  delayer(context) {
+  delayer(context) async {
     bool first = true;
+//    print('delayer');
+//    for (var item in tokenItems) {
+//      print(item.tokenKey);
+//    }
+//    print('end of delayer');
     tokenItems.forEach((element) {
       if (element.tokenKey == 'first') {
         first = false;
@@ -357,18 +365,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     });
     try {
       if (!first) {
-        if (tokenItems.last.tokenKey == 'token') {
+//        print('inside not first');
+        for (var i in tokenItems) {
+//          print(i.tokenKey);
+          if (i.tokenKey == 'token') {
+//          await allQs(context);
 //          subjects();
-          Navigator.pushReplacementNamed(context, CustomNavigation.id);
-        } else {
-          Navigator.pushReplacementNamed(context, LoginScreen.id, arguments: {
-            'addToken': addNewItem,
-          });
+            Navigator.pushReplacementNamed(context, CustomNavigation.id,
+                arguments: {
+                  'addToken': addNewItem,
+                  'deleteAll': deleteAll,
+                });
+            return;
+          }
         }
+        Navigator.pushReplacementNamed(context, LoginScreen.id, arguments: {
+          'addToken': addNewItem,
+          'deleteAll': deleteAll,
+        });
       } else {
         Navigator.pushReplacementNamed(context, SliderScreen.id, arguments: {
           'add': addNewItem,
-          'addToken': addNewItem,
+          'deleteAll': deleteAll,
 //          'subjects': subjects,
         });
       }
@@ -384,15 +402,39 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         tokenItems = all.keys
             .map((key) => SecItem(key, all[key]))
             .toList(growable: false);
-        tokenString = tokenItems.last.tokenValue;
+//        print('inside');
+//        for (var item in tokenItems) {
+//          print(item.tokenKey);
+//        }
+        if (tokenItems.length > 0) {
+//          tokenString = tokenItems.last.tokenValue;
+          for (var item in tokenItems) {
+            if (item.tokenKey == 'token') {
+              tokenString = item.tokenValue;
+            }
+            if (item.tokenKey == 'refresh') {
+              refreshTokenString = item.tokenValue;
+            }
+          }
+        }
         return tokenItems;
       });
     }
+//    print('outside');
+//    for (var item in tokenItems) {
+//      print(item.tokenKey);
+//    }
   }
 
-  void _deleteAll() async {
+  void deleteAll() async {
     await _storage.deleteAll();
+    addNewItem('first', 'true');
     _readAll();
+//    final all = await _storage.readAll();
+//    all.forEach((key, value) async {
+//      await _storage.delete(key: key);
+//    });
+//    print(tokenItems);
   }
 
   void addNewItem(key1, value1) async {
@@ -403,24 +445,77 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     _readAll();
   }
 
-  Future<Null> _performAction(_ItemActions action, SecItem item) async {
-    switch (action) {
-      case _ItemActions.delete:
-        await _storage.delete(key: item.key);
-        _readAll();
+//  Future<Null> _performAction(_ItemActions action, SecItem item) async {
+//    switch (action) {
+//      case _ItemActions.delete:
+//        await _storage.delete(key: item.key);
+//        _readAll();
+//
+//        break;
+//      case _ItemActions.edit:
+//        final result = await showDialog<String>(
+//            context: context,
+//            builder: (context) => _EditItemWidget(item.value));
+//        if (result != null) {
+//          _storage.write(key: item.key, value: result);
+//          _readAll();
+//        }
+//        break;
+//    }
+//  }
 
-        break;
-      case _ItemActions.edit:
-        final result = await showDialog<String>(
-            context: context,
-            builder: (context) => _EditItemWidget(item.value));
-        if (result != null) {
-          _storage.write(key: item.key, value: result);
-          _readAll();
-        }
-        break;
-    }
-  }
+//  void subjects() async {
+//    var outcome = await Subjects().getData();
+//    if (outcome != null) {
+//      List subjectList = outcome['data'];
+//      for (int i = 0; i < subjectList.length; i++) {
+//        subjectMap
+//            .addAll({subjectList[i]['name']: subjectList[i]['id'].toString()});
+//        if (!subjectNameList.contains(subjectList[i]['name'])) {
+//          subjectNameList.add(subjectList[i]['name']);
+//        }
+//      }
+//    }
+//  }
+
+//  Future allQs(BuildContext context) async {
+//    dynamic data = await AllQuestions(context: context, page: 1).getData();
+//    if (data != null) {
+//      List questionsList = data['data']['questions'];
+//      if (!mounted) return;
+//      setState(() {
+//        for (int i = 0; i < questionsList.length; i++) {
+//          if (questionsList[i]['image'].length > 0) {
+//            imageUrl = 'http://api.study-share.info' +
+//                questionsList[i]['image'][0]['path'];
+//          }
+//          mainScreenQuestions.add(
+//            CustomQuestionWidget(
+//              id: questionsList[i]['id'].toInt(),
+//              title: questionsList[i]['title'],
+//              description: questionsList[i]['description'],
+//              pubDate: DateTime.parse(questionsList[i]['pub_date_original']
+//                  .toString()
+//                  .substring(0, 19)),
+//              likes: questionsList[i]['likes'],
+//              dislikes: questionsList[i]['dislikes'],
+//              userVote: questionsList[i]['user_vote'],
+////              userEmail: questionsList[i]['user']['email'],
+////              username: questionsList[i]['user']['username'],
+////              subjectId: questionsList[i]['subject']['id'],
+////              subjectAuthor: questionsList[i]['subject']['author'],
+////              subjectName: questionsList[i]['subject']['name'],
+////              subjectRating: questionsList[i]['subject']['rating'],
+//              imageUrl: imageUrl,
+//              answerCount: questionsList[i]['answer_count'],
+//            ),
+//          );
+//          imageUrl = null;
+//        }
+//      });
+//    }
+////    subjects();
+//  }
 
   @override
   Widget build(BuildContext context) {
@@ -465,61 +560,116 @@ class _SliderScreenState extends State<SliderScreen> {
   static double num16 = 16;
   static double num45 = 45;
   double num80 = 80;
-  static double num220 = 220;
+  static double num220 = 200;
 
   List<Widget> slides;
 
   List smth(context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    num16 = height * 0.0227;
+    num45 = width * 0.12;
+    num80 = height * 0.1133;
+    num220 = height * 0.3116;
     slides = sliderItems
         .map((item) => Container(
-            padding: EdgeInsets.symmetric(horizontal: 18.0),
-            child: Column(
+                child: Stack(
               children: <Widget>[
-                Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
-                  child: Image.asset(
-                    item['image'],
-                    fit: BoxFit.fitWidth,
-                    width: num220,
-                    alignment: Alignment.bottomCenter,
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        fit: BoxFit.fill,
+                        image: AssetImage(item['image']),
+                      ),
+                    ),
                   ),
+//                    child: Container(
+//                      child: FittedBox(
+//                        child: Image.asset(
+//                          item['image'],
+//                          fit: BoxFit.fill,
+////                    alignment: Alignment.bottomCenter,
+//                        ),
+//                      ),
+//                    ),
                 ),
-                Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
+                Center(
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 30.0),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(item['header'],
-                            style: TextStyle(
-                                fontSize: num45,
-                                fontWeight: FontWeight.w300,
-                                color: Color(0XFF3F3D56),
-                                height: 2.0)),
-                        Text(
-                          item['description'],
-                          style: TextStyle(
-                              color: Colors.grey,
-                              letterSpacing: 1.2,
-                              fontSize: num16,
-                              height: 1.3),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: num80),
-                        FlatButton(
-                          child: Text(fromSettings ? 'back' : 'skip',
-                              style: TextStyle(color: Color(0xff828282))),
-                          onPressed: () => fromSettings
-                              ? Navigator.pop(context)
-                              : Navigator.pushReplacementNamed(
-                                  context, LoginScreen.id,
-                                  arguments: {
-                                      'addToken': addToken,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(height: num45),
+                              Text(item['header'],
+                                  style: TextStyle(
+                                      fontSize: num45,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      height: 2.0)),
+                              SizedBox(height: num16),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6),
+                                child: Text(
+                                  item['description'],
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      letterSpacing: 1.2,
+                                      fontSize: num16,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.3),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              SizedBox(height: num80),
+                              SizedBox(
+                                height: num45 + 11,
+                                width: double.infinity,
+                                child: FlatButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                  ),
+                                  color: Colors.white,
+                                  child: Text(fromSettings ? 'BACK' : 'SKIP',
+                                      style: TextStyle(
+                                          letterSpacing: 3,
+                                          color: Colors.black,
+                                          fontSize: 16)),
+                                  onPressed: () => fromSettings
+                                      ? Navigator.pop(context)
+                                      : Navigator.pushReplacementNamed(
+                                          context, LoginScreen.id,
+                                          arguments: {
+                                              'deleteAll': deleteAll,
+                                              'addToken': add != null
+                                                  ? add
+                                                  : () => print('fuuuuuuu'),
 //                                      'subjects': subjects,
-                                    }),
-                        )
+                                            }),
+                                ),
+                              ),
+                              SizedBox(height: num45),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -538,21 +688,17 @@ class _SliderScreenState extends State<SliderScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final Map mapInit = ModalRoute.of(context).settings.arguments;
-    if (mapInit['addToken'] != null) {
-      addToken = mapInit['addToken'];
-//      subjects = mapInit['subjects'];
-    }
-  }
+//  void didChangeDependencies() {
+//    super.didChangeDependencies();
+//    final Map mapInit = ModalRoute.of(context).settings.arguments;
+//    if (mapInit['addToken'] != null) {
+//      addToken = mapInit['addToken'];
+////      subjects = mapInit['subjects'];
+//    }
+//  }
 
   Function add;
+  Function deleteAll;
   Function addToken;
   Function subjects;
 
@@ -564,8 +710,8 @@ class _SliderScreenState extends State<SliderScreen> {
             width: 10.0,
             decoration: BoxDecoration(
                 color: currentPage.round() == index
-                    ? Color(0XFF256075)
-                    : Color(0XFF256075).withOpacity(0.2),
+                    ? Colors.white
+                    : Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10.0)),
           ));
 
@@ -576,16 +722,15 @@ class _SliderScreenState extends State<SliderScreen> {
   @override
   Widget build(BuildContext context) {
     final Map map = ModalRoute.of(context).settings.arguments;
-    if (map['add'] != null) {
+    if (map != null && map['add'] != null) {
       add = map['add'];
     } else if (map['fromSettings'] != null) {
       fromSettings = map['fromSettings'];
     }
-    double height = MediaQuery.of(context).size.height;
-    num16 = height * 0.0227;
-    num45 = height * 0.0637;
-    num80 = height * 0.1133;
-    num220 = height * 0.3116;
+
+    if (map != null && map['deleteAll'] != null) {
+      deleteAll = map['deleteAll'];
+    }
     return Scaffold(
       body: Container(
         child: Stack(

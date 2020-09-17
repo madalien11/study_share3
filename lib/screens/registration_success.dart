@@ -6,6 +6,8 @@ class RegistrationSuccess extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double wNum18 = width * 0.048;
     double num10 = height * 0.0142;
     double num12 = height * 0.0170;
     double num14 = height * 0.0198;
@@ -77,7 +79,7 @@ class RegistrationSuccess extends StatelessWidget {
                         child: Text(
                           'SIGN IN',
                           style: TextStyle(
-                              fontSize: num18,
+                              fontSize: wNum18,
                               color: Colors.white,
                               letterSpacing: 3),
                         )),

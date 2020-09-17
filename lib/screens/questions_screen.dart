@@ -83,9 +83,10 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
               id: questionsList[i]['id'].toInt(),
               title: questionsList[i]['title'],
               description: questionsList[i]['description'],
-              pubDate: DateTime.parse(
-                  questionsList[i]['pub_date'].toString().substring(0, 19) +
-                      'Z'),
+              pubDate: DateTime.parse(questionsList[i]['pub_date_original']
+                      .toString()
+                      .substring(0, 19) +
+                  'Z'),
               likes: questionsList[i]['likes'],
               dislikes: questionsList[i]['dislikes'],
               userVote: questionsList[i]['user_vote'],
