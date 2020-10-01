@@ -23,9 +23,11 @@ class Subjects {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
 //      print('subjects success');
-      return jsonDecode(data);
+//      return jsonDecode(data);
     } else {
       print('subjects ' + response.statusCode.toString());
     }
@@ -43,9 +45,10 @@ class MySubjectsData {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-//      print('subjects success');
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
       await Refresh().refresh();
       http.Response response = await http.get(
@@ -56,9 +59,10 @@ class MySubjectsData {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-//      print('subjects success');
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      logOutInData();
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
@@ -78,7 +82,8 @@ Future<List<Subject>> fetchSubject(BuildContext context) async {
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||
       response.statusCode == 202) {
-    var jsonData = jsonDecode(response.body);
+    String source = Utf8Decoder().convert(response.bodyBytes);
+    var jsonData = jsonDecode(source);
     List subjectsList = jsonData['data'];
     List<Subject> subjects = [];
     for (var subject in subjectsList) {
@@ -100,7 +105,8 @@ Future<List<Subject>> fetchSubject(BuildContext context) async {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      var jsonData = jsonDecode(response.body);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      var jsonData = jsonDecode(source);
       List subjectsList = jsonData['data'];
       List<Subject> subjects = [];
       for (var subject in subjectsList) {
@@ -129,8 +135,10 @@ class SubjectFollow {
         headers: {'Authorization': 'Bearer $tokenString'},
         body: {'subject': subjectMap[subject]});
     if (response.statusCode == 446 || response.statusCode == 200) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
 //      logOutInData();
       await Refresh().refresh();
@@ -139,8 +147,10 @@ class SubjectFollow {
           headers: {'Authorization': 'Bearer $tokenString'},
           body: {'subject': subjectMap[subject]});
       if (response.statusCode == 446 || response.statusCode == 200) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
       print(response.statusCode);
@@ -159,8 +169,10 @@ class SubjectUnfollow {
         "http://api.study-share.info/api/v1/subject/unfollow/${subjectMap[subject]}",
         headers: {'Authorization': 'Bearer $tokenString'});
     if (response.statusCode == 200) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
 //      logOutInData();
       await Refresh().refresh();
@@ -168,8 +180,10 @@ class SubjectUnfollow {
           "http://api.study-share.info/api/v1/subject/unfollow/${subjectMap[subject]}",
           headers: {'Authorization': 'Bearer $tokenString'});
       if (response.statusCode == 200) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
       print(response.statusCode);
@@ -190,8 +204,10 @@ class LeadersData {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
 //      logOutInData();
       await Refresh().refresh();
@@ -202,8 +218,9 @@ class LeadersData {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+//        String data = response.body;
+        return jsonDecode(source);
       }
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
       print(response.statusCode);
@@ -224,8 +241,10 @@ class Leader {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+//      String data = response.body;
+//      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
     } else if (response.statusCode == 401) {
 //      logOutInData();
       await Refresh().refresh();
@@ -236,8 +255,10 @@ class Leader {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
       print(response.statusCode);
@@ -515,8 +536,9 @@ class Login {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      user = jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+//      String data = response.body;
+      user = jsonDecode(source);
 //      token = user['access'];
       return response;
     } else {
@@ -534,7 +556,8 @@ class Refresh {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      tokenString = jsonDecode(response.body)['access'];
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      tokenString = jsonDecode(source)['access'];
       return response;
     } else {
       print(response.statusCode);
@@ -646,12 +669,13 @@ class AllQuestions {
   int page;
   AllQuestions({this.context, this.page = 1});
   Future getData() async {
-    print('AllQuestions is called');
+//    print('AllQuestions is called');
     http.Response response;
     response = await http.get(
       "http://api.study-share.info//api/v1/question/main/${page.toString()}",
       headers: {
         'Authorization': 'Bearer $tokenString',
+        'Content-Type': 'application/json'
       },
     );
 //    } else if (user['access'] != null) {
@@ -665,12 +689,13 @@ class AllQuestions {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+//      String data = response.body;
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
     } else if (response.statusCode == 401) {
 //      logOutInData();
       await Refresh().refresh();
-      print('AllQuestions is called');
+//      print('AllQuestions is called');
       http.Response response;
       response = await http.get(
         "http://api.study-share.info//api/v1/question/main/${page.toString()}",
@@ -689,8 +714,10 @@ class AllQuestions {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+//        String data = response.body;
+//        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
       }
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
     } else {
@@ -711,7 +738,8 @@ Future<List<Question>> fetchQuestion(BuildContext context, int page) async {
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||
       response.statusCode == 202) {
-    var jsonData = jsonDecode(response.body);
+    String source = Utf8Decoder().convert(response.bodyBytes);
+    var jsonData = jsonDecode(source);
     List questionsList = jsonData['data']['questions'];
     List<Question> questions = [];
     for (var quest in questionsList) {
@@ -748,7 +776,8 @@ Future<List<Question>> fetchQuestion(BuildContext context, int page) async {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      var jsonData = jsonDecode(response.body);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      var jsonData = jsonDecode(source);
       List questionsList = jsonData['data']['questions'];
       List<Question> questions = [];
       for (var quest in questionsList) {
@@ -794,8 +823,10 @@ class QuestionById {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
 //      logOutInData();
       await Refresh().refresh();
@@ -808,8 +839,10 @@ class QuestionById {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
       print(response.statusCode);
@@ -834,8 +867,10 @@ class MyQuestions {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401 || response.statusCode == 500) {
 //      logOutInData();
       await Refresh().refresh();
@@ -848,19 +883,25 @@ class MyQuestions {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       } else {
         print(response.statusCode);
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      print(response.statusCode);
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
     } else {
       print(response.statusCode);
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     }
   }
 }
@@ -879,8 +920,10 @@ class MyAnswers {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
       await Refresh().refresh();
       http.Response response = await http.get(
@@ -892,8 +935,10 @@ class MyAnswers {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      logOutInData();
       print(response.statusCode);
@@ -922,8 +967,10 @@ class ChangePassword {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
       await Refresh().refresh();
       http.Response response = await http
@@ -937,14 +984,18 @@ class ChangePassword {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      logOutInData();
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
       print(response.statusCode);
     } else {
       print(response.statusCode);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
     }
   }
 }
@@ -962,12 +1013,17 @@ class ChangeProfile {
       'username': username,
       'password': password,
     });
+//    print(response.body);
+//    String source1 = Utf8Decoder().convert(response.bodyBytes);
+//    print(jsonDecode(source1));
 
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
 //      logOutInData();
       await Refresh().refresh();
@@ -982,13 +1038,17 @@ class ChangeProfile {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
       print(response.statusCode);
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
     } else {
       print(response.statusCode);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
     }
   }
 }
@@ -1010,8 +1070,10 @@ class CreateAnswer {
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
-      String data = response.body;
-      return jsonDecode(data);
+      String source = Utf8Decoder().convert(response.bodyBytes);
+      return jsonDecode(source);
+//      String data = response.body;
+//      return jsonDecode(data);
     } else if (response.statusCode == 401) {
       await Refresh().refresh();
       http.Response response = await http
@@ -1025,8 +1087,10 @@ class CreateAnswer {
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
-        String data = response.body;
-        return jsonDecode(data);
+        String source = Utf8Decoder().convert(response.bodyBytes);
+        return jsonDecode(source);
+//        String data = response.body;
+//        return jsonDecode(data);
       }
 //      logOutInData();
 //      Navigator.pushReplacementNamed(context, LoginScreen.id);
@@ -1145,6 +1209,75 @@ class SearchFilter {
     } else {
       print('search and filter ' + response.statusCode.toString());
       return response;
+    }
+  }
+}
+
+class Complain {
+  int id;
+  List<int> value;
+  BuildContext context;
+  String t;
+  Complain({@required this.id, @required this.value, this.context, this.t});
+  Future doIt() async {
+//    var dioRequest = dio.Dio();
+//    dioRequest.options.baseUrl =
+//        "http://api.study-share.info//api/v1/complain/$id";
+//    if (tokenString != null) {
+//      dioRequest.options.headers = {
+//        'Authorization': 'Bearer $tokenString',
+//      };
+//    } else if (user['access'] != null) {
+//      dioRequest.options.headers = {
+//        'Authorization': 'Bearer ${user['access']}',
+//      };
+//    }
+//
+//    var formData = new dio.FormData.fromMap({
+//      "value": value,
+//      "t": t,
+//    });
+//
+//    var response = await dioRequest.post(
+//      "http://api.study-share.info//api/v1/complain/$id",
+//      data: formData,
+//    );
+//    return response;
+
+    http.Response response = await http.post(
+        "http://api.study-share.info//api/v1/complain/$id",
+        headers: {
+          'Authorization': 'Bearer $tokenString',
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode({
+          'value': value,
+          "t": t,
+        }));
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
+      return response;
+    } else if (response.statusCode == 401) {
+      await Refresh().refresh();
+      http.Response response = await http.post(
+          "http://api.study-share.info//api/v1/complain/$id",
+          headers: {
+            'Authorization': 'Bearer $tokenString',
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode({
+            'value': value,
+            "t": t,
+          }));
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
+        return response;
+      }
+      print(response.statusCode);
+    } else {
+      print(response.statusCode);
     }
   }
 }

@@ -59,12 +59,13 @@ class _SearchScreenState extends State<SearchScreen> {
       context: context,
 //            byAnswer: dropdownSortBy.toString().toLowerCase(),
     ).getData();
+    String source = Utf8Decoder().convert(data.bodyBytes);
     if (data != null) {
-      if (jsonDecode(data.body)['status'] == 404) {
-        showAlertDialog(context, jsonDecode(data.body)['detail']);
+      if (jsonDecode(source)['status'] == 404) {
+        showAlertDialog(context, jsonDecode(source)['detail']);
         success = false;
       } else {
-        List questionsList = jsonDecode(data.body)['data']['questions'];
+        List questionsList = jsonDecode(source)['data']['questions'];
         if (!mounted) return;
         setState(() {
           if (questionsList != null) {
@@ -76,8 +77,8 @@ class _SearchScreenState extends State<SearchScreen> {
               newSearchFilterResult.add(
                 CustomQuestionWidget(
                   id: questionsList[i]['id'].toInt(),
-                  title: questionsList[i]['title'],
-                  description: questionsList[i]['description'],
+                  title: questionsList[i]['title'].toString(),
+                  description: questionsList[i]['description'].toString(),
                   pubDate: DateTime.parse(questionsList[i]['pub_date_original']
                       .toString()
                       .substring(0, 19)),
@@ -101,7 +102,14 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    if (searchFilterResult != null) searchFilterResult.clear();
     _isButtonDisabled = false;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (searchFilterResult != null) searchFilterResult.clear();
   }
 
   @override

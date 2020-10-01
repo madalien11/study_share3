@@ -161,10 +161,11 @@ class _ForgotPasswordCodeState extends State<ForgotPasswordCode> {
                                                 'email': map['email'],
                                               });
                                         } else {
+                                          String source = Utf8Decoder()
+                                              .convert(response.bodyBytes);
                                           showAlertDialog(
                                               context,
-                                              jsonDecode(response.body)[
-                                                      'detail'] ??
+                                              jsonDecode(source)['detail'] ??
                                                   'Invalid data');
                                         }
                                       } catch (e) {

@@ -30,9 +30,10 @@ class _MySubjectsState extends State<MySubjects> {
   }
 
   Future<bool> _onBackPressed() async {
-    Navigator.of(context).pop({
-      'mySubCount': newSubCount.toString(),
-    });
+    Navigator.pop(context);
+//    Navigator.of(context).pop({
+//      'mySubCount': newSubCount.toString(),
+//    });
     return true;
 //    return showDialog(
 //          context: context,

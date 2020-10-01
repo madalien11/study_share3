@@ -151,12 +151,12 @@ class _CustomFullQuestionWidgetState extends State<CustomFullQuestionWidget> {
                             CircleAvatar(
                               radius: num17,
                               backgroundColor: Color(0xffE5E5E5),
-                              backgroundImage: NetworkImage(
-                                  'https://placeimg.com/640/480/any'),
+//                              backgroundImage: NetworkImage(
+//                                  'https://placeimg.com/640/480/any'),
                             ),
                             SizedBox(width: num7),
                             Text(
-                              'Alex Conor',
+                              '',
                               style: TextStyle(color: Color(0xFF828282)),
                             ),
                           ],
@@ -268,7 +268,9 @@ class _CustomFullQuestionWidgetState extends State<CustomFullQuestionWidget> {
                                   if (response.statusCode == 200 ||
                                       response.statusCode == 201 ||
                                       response.statusCode == 202) {
-                                    data = jsonDecode(response.body);
+                                    String source = Utf8Decoder()
+                                        .convert(response.bodyBytes);
+                                    data = jsonDecode(source);
                                     print(data);
                                     setState(() {
                                       userVoteCheck =
@@ -332,7 +334,9 @@ class _CustomFullQuestionWidgetState extends State<CustomFullQuestionWidget> {
                                   if (response.statusCode == 200 ||
                                       response.statusCode == 201 ||
                                       response.statusCode == 202) {
-                                    data = jsonDecode(response.body);
+                                    String source = Utf8Decoder()
+                                        .convert(response.bodyBytes);
+                                    data = jsonDecode(source);
                                     print(data);
                                     setState(() {
                                       userVoteCheck =

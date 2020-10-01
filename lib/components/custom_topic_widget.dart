@@ -46,12 +46,14 @@ class CustomTopicWidget extends StatelessWidget {
     dynamic data =
         await SearchFilter(subject: subject.toString(), context: context)
             .getData();
+    String source = Utf8Decoder().convert(data.bodyBytes);
+    var decoded = jsonDecode(source);
     if (data != null) {
-      if (jsonDecode(data.body)['status'] == 404) {
-        showAlertDialog(context, jsonDecode(data.body)['detail']);
+      if (decoded['status'] == 404) {
+        showAlertDialog(context, decoded['detail']);
         success = false;
       } else {
-        List questionsList = jsonDecode(data.body)['data']['questions'];
+        List questionsList = decoded['data']['questions'];
         if (questionsList != null) {
           for (int i = 0; i < questionsList.length; i++) {
             if (questionsList[i]['image'].length > 0) {
@@ -61,8 +63,8 @@ class CustomTopicWidget extends StatelessWidget {
             newSearchFilterResult.add(
               CustomQuestionWidget(
                 id: questionsList[i]['id'].toInt(),
-                title: questionsList[i]['title'],
-                description: questionsList[i]['description'],
+                title: questionsList[i]['title'].toString(),
+                description: questionsList[i]['description'].toString(),
                 pubDate: DateTime.parse(questionsList[i]['pub_date_original']
                     .toString()
                     .substring(0, 19)),

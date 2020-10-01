@@ -165,10 +165,11 @@ class _RegistrationTwoScreenState extends State<RegistrationTwoScreen> {
                                               context, RegistrationSuccess.id);
                                         } else {
                                           setState(() {
+                                            String source = Utf8Decoder()
+                                                .convert(response.bodyBytes);
                                             showAlertDialog(
                                                 context,
-                                                jsonDecode(response.body)[
-                                                        'detail'] ??
+                                                jsonDecode(source)['detail'] ??
                                                     'Invalid data');
                                             errorText = 'invalid data';
                                             showError = true;

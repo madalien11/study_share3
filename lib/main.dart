@@ -32,6 +32,8 @@ import 'package:kindainternship/screens/search_filter_result.dart';
 import 'package:kindainternship/logout.dart';
 import 'screens/instructions.dart';
 import 'package:flutter/services.dart';
+import 'package:cupertino_back_gesture/cupertino_back_gesture.dart';
+import 'dart:ui';
 
 //enum _Actions { deleteAll }
 //enum _ItemActions { delete, edit }
@@ -209,44 +211,54 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      routes: {
-        HomeScreen.id: (context) => HomeScreen(),
-        MyAnswersPage.id: (context) => MyAnswersPage(),
-        MySubjects.id: (context) => MySubjects(),
-        MyQuestionsPage.id: (context) => MyQuestionsPage(),
-        ChangeEmailScreen.id: (context) => ChangeEmailScreen(),
-        EditProfileScreen.id: (context) => EditProfileScreen(),
-        ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
-        SettingsScreen.id: (context) => SettingsScreen(),
-        SearchScreen.id: (context) => SearchScreen(),
-        QuestionsScreen.id: (context) => QuestionsScreen(),
-        SingleQuestionScreen.id: (context) => SingleQuestionScreen(),
-        LeadersScreen.id: (context) => LeadersScreen(),
-        ProfileScreen.id: (context) => ProfileScreen(),
-        UpdateProfilePhoto.id: (context) => UpdateProfilePhoto(),
-        AddQuestionScreen.id: (context) => AddQuestionScreen(),
-        LoginScreen.id: (context) => LoginScreen(),
-        RegistrationScreen.id: (context) => RegistrationScreen(),
-        RegistrationTwoScreen.id: (context) => RegistrationTwoScreen(),
-        RegistrationSuccess.id: (context) => RegistrationSuccess(),
-        CustomNavigation.id: (context) => CustomNavigation(),
-        ForgotPassword.id: (context) => ForgotPassword(),
-        ForgotPasswordCode.id: (context) => ForgotPasswordCode(),
-        ForgotPasswordChange.id: (context) => ForgotPasswordChange(),
-        SliderScreen.id: (context) => SliderScreen(),
-        WelcomeScreen.id: (context) => WelcomeScreen(),
-        SearchFilterResult.id: (context) => SearchFilterResult(),
-        InstructionsScreen.id: (context) => InstructionsScreen(),
-      },
+    return BackGestureWidthTheme(
+      backGestureWidth: BackGestureWidth.fraction(1 / 2),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        routes: {
+          HomeScreen.id: (context) => HomeScreen(),
+          MyAnswersPage.id: (context) => MyAnswersPage(),
+          MySubjects.id: (context) => MySubjects(),
+          MyQuestionsPage.id: (context) => MyQuestionsPage(),
+          ChangeEmailScreen.id: (context) => ChangeEmailScreen(),
+          EditProfileScreen.id: (context) => EditProfileScreen(),
+          ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
+          SettingsScreen.id: (context) => SettingsScreen(),
+          SearchScreen.id: (context) => SearchScreen(),
+          QuestionsScreen.id: (context) => QuestionsScreen(),
+          SingleQuestionScreen.id: (context) => SingleQuestionScreen(),
+          LeadersScreen.id: (context) => LeadersScreen(),
+          ProfileScreen.id: (context) => ProfileScreen(),
+          UpdateProfilePhoto.id: (context) => UpdateProfilePhoto(),
+          AddQuestionScreen.id: (context) => AddQuestionScreen(),
+          LoginScreen.id: (context) => LoginScreen(),
+          RegistrationScreen.id: (context) => RegistrationScreen(),
+          RegistrationTwoScreen.id: (context) => RegistrationTwoScreen(),
+          RegistrationSuccess.id: (context) => RegistrationSuccess(),
+          CustomNavigation.id: (context) => CustomNavigation(),
+          ForgotPassword.id: (context) => ForgotPassword(),
+          ForgotPasswordCode.id: (context) => ForgotPasswordCode(),
+          ForgotPasswordChange.id: (context) => ForgotPasswordChange(),
+          SliderScreen.id: (context) => SliderScreen(),
+          WelcomeScreen.id: (context) => WelcomeScreen(),
+          SearchFilterResult.id: (context) => SearchFilterResult(),
+          InstructionsScreen.id: (context) => InstructionsScreen(),
+        },
 //      initialRoute: LoginScreen.id,
-      title: 'StudyShare',
-      theme: ThemeData(
-        primarySwatch: Colors.amber,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        title: 'StudyShare',
+        theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+              TargetPlatform.iOS:
+                  CupertinoPageTransitionsBuilderCustomBackGestureWidth(),
+            },
+          ),
+          primarySwatch: Colors.amber,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: WelcomeScreen(),
       ),
-      home: WelcomeScreen(),
     );
   }
 }
@@ -572,20 +584,30 @@ class _SliderScreenState extends State<SliderScreen> {
     num80 = height * 0.1133;
     num220 = height * 0.3116;
     slides = sliderItems
-        .map((item) => Container(
-                child: Stack(
-              children: <Widget>[
-                Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.fill,
-                        image: AssetImage(item['image']),
+        .map((item) => SafeArea(
+              child: Container(
+                  child: Stack(
+                children: <Widget>[
+                  Center(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: AssetImage(item['image']),
+                        ),
+                      ),
+                      child: ClipRRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.0)),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
 //                    child: Container(
 //                      child: FittedBox(
 //                        child: Image.asset(
@@ -595,88 +617,259 @@ class _SliderScreenState extends State<SliderScreen> {
 //                        ),
 //                      ),
 //                    ),
-                ),
-                Center(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.4),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              SizedBox(height: num45),
-                              Text(item['header'],
-                                  style: TextStyle(
-                                      fontSize: num45,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      height: 2.0)),
-                              SizedBox(height: num16),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 6),
-                                child: Text(
-                                  item['description'],
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      letterSpacing: 1.2,
-                                      fontSize: num16,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.3),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              SizedBox(height: num80),
-                              SizedBox(
-                                height: num45 + 11,
-                                width: double.infinity,
-                                child: FlatButton(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                  color: Colors.white,
-                                  child: Text(fromSettings ? 'BACK' : 'SKIP',
-                                      style: TextStyle(
-                                          letterSpacing: 3,
-                                          color: Colors.black,
-                                          fontSize: 16)),
-                                  onPressed: () => fromSettings
-                                      ? Navigator.pop(context)
-                                      : Navigator.pushReplacementNamed(
-                                          context, LoginScreen.id,
-                                          arguments: {
-                                              'deleteAll': deleteAll,
-                                              'addToken': add != null
-                                                  ? add
-                                                  : () => print('fuuuuuuu'),
-//                                      'subjects': subjects,
-                                            }),
-                                ),
-                              ),
-                              SizedBox(height: num45),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
-                )
-              ],
-            )))
+                  Container(
+//                    color: Colors.black.withOpacity(0.2),
+                    child: Center(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 25.0),
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: <Widget>[
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  item['first']
+                                      ? SizedBox(height: 125)
+                                      : Container(),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.5),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.45),
+                                          spreadRadius: 10,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        SizedBox(height: num45 - 15),
+                                        Text(item['header'],
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: num45,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                height: 2.0)),
+                                        SizedBox(height: num16),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 6),
+                                          child: Text(
+                                            item['description'],
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                letterSpacing: 1.2,
+                                                fontSize: num16,
+                                                fontWeight: FontWeight.w500,
+                                                height: 1.3),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+//                                        SizedBox(height: num45),
+//                                        SizedBox(
+//                                          height: num45 + 11,
+//                                          width: double.infinity,
+//                                          child: FlatButton(
+//                                            shape: RoundedRectangleBorder(
+//                                              borderRadius:
+//                                                  BorderRadius.circular(30.0),
+//                                            ),
+//                                            color: Colors.white,
+//                                            child: Text(
+//                                                fromSettings ? 'BACK' : 'SKIP',
+//                                                style: TextStyle(
+//                                                    letterSpacing: 3,
+//                                                    color: Colors.black,
+//                                                    fontSize: 16)),
+//                                            onPressed: () => fromSettings
+//                                                ? Navigator.pop(context)
+//                                                : Navigator
+//                                                    .pushReplacementNamed(
+//                                                        context, LoginScreen.id,
+//                                                        arguments: {
+//                                                        'deleteAll': deleteAll,
+//                                                        'addToken': add != null
+//                                                            ? add
+//                                                            : () => print(
+//                                                                'uuuuuuu'),
+////                                      'subjects': subjects,
+//                                                      }),
+//                                          ),
+//                                        ),
+                                        SizedBox(height: num45 - 10),
+                                      ],
+                                    ),
+                                  ),
+                                  item['first']
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 100),
+                                          child: Text(
+                                            'smth',
+                                            style: TextStyle(
+                                                backgroundColor: Colors.orange),
+                                          ),
+                                        )
+                                      : Container()
+                                ],
+                              ),
+                            ),
+//                            item['first']
+//                                ? Padding(
+//                                    padding: const EdgeInsets.only(top: 100),
+//                                    child: Text('smth'),
+//                                  )
+//                                : Container()
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              )),
+            ))
         .toList();
+
+    slides.removeLast();
+    slides.add(SafeArea(
+      child: Container(
+          child: Stack(
+        children: <Widget>[
+          Center(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image:
+                      AssetImage(sliderItems[sliderItems.length - 1]['image']),
+                ),
+              ),
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                  child: Container(
+                    decoration:
+                        BoxDecoration(color: Colors.white.withOpacity(0.0)),
+                  ),
+                ),
+              ),
+            ),
+//                    child: Container(
+//                      child: FittedBox(
+//                        child: Image.asset(
+//                          item['image'],
+//                          fit: BoxFit.fill,
+////                    alignment: Alignment.bottomCenter,
+//                        ),
+//                      ),
+//                    ),
+          ),
+          Container(
+//                    color: Colors.black.withOpacity(0.2),
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 25.0),
+                child: ListView(
+                  shrinkWrap: true,
+                  children: <Widget>[
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.45),
+                                  spreadRadius: 10,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                SizedBox(height: num45 - 15),
+                                Text(
+                                    sliderItems[sliderItems.length - 1]
+                                        ['header'],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: num45,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        height: 2.0)),
+                                SizedBox(height: num16),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 6),
+                                  child: Text(
+                                    sliderItems[sliderItems.length - 1]
+                                        ['description'],
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        letterSpacing: 1.2,
+                                        fontSize: num16,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.3),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                SizedBox(height: num45),
+                                SizedBox(
+                                  height: num45 + 11,
+                                  width: double.infinity,
+                                  child: FlatButton(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                    color: Colors.white,
+                                    child: Text(fromSettings ? 'BACK' : 'SKIP',
+                                        style: TextStyle(
+                                            letterSpacing: 3,
+                                            color: Colors.black,
+                                            fontSize: 16)),
+                                    onPressed: () => fromSettings
+                                        ? Navigator.pop(context)
+                                        : Navigator.pushReplacementNamed(
+                                            context, LoginScreen.id,
+                                            arguments: {
+                                                'deleteAll': deleteAll,
+                                                'addToken': add != null
+                                                    ? add
+                                                    : () => print('uuuuuuu'),
+//                                      'subjects': subjects,
+                                              }),
+                                  ),
+                                ),
+                                SizedBox(height: num45 - 10),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
+      )),
+    ));
     return slides;
   }
 
@@ -710,8 +903,8 @@ class _SliderScreenState extends State<SliderScreen> {
             width: 10.0,
             decoration: BoxDecoration(
                 color: currentPage.round() == index
-                    ? Colors.white
-                    : Colors.white.withOpacity(0.2),
+                    ? Color(0xFFFF7A10)
+                    : Colors.black.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(10.0)),
           ));
 

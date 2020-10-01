@@ -84,8 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
           mainScreenQuestions.add(
             CustomQuestionWidget(
               id: questionsList[i]['id'].toInt(),
-              title: questionsList[i]['title'],
-              description: questionsList[i]['description'],
+              title: questionsList[i]['title'].toString(),
+              description: questionsList[i]['description'].toString(),
               pubDate: DateTime.parse(questionsList[i]['pub_date_original']
                   .toString()
                   .substring(0, 19)),
@@ -266,18 +266,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                               email: email, password: password)
                                           .login();
                                       if (outcome.statusCode == 401) {
+                                        String source = Utf8Decoder()
+                                            .convert(outcome.bodyBytes);
                                         setState(() {
-                                          showAlertDialog(
-                                              context,
-                                              jsonDecode(
-                                                  outcome.body)['detail']);
+                                          showAlertDialog(context,
+                                              jsonDecode(source)['detail']);
                                           showError = true;
                                           isLoading = false;
                                           _isButtonDisabled = false;
                                         });
                                       } else if (outcome.statusCode == 200) {
-                                        dynamic userInfo =
-                                            jsonDecode(outcome.body);
+                                        String source = Utf8Decoder()
+                                            .convert(outcome.bodyBytes);
+                                        dynamic userInfo = jsonDecode(source);
                                         tokenString = userInfo['access'];
                                         refreshTokenString =
                                             userInfo['refresh'];

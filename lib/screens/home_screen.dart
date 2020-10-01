@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kindainternship/data/data.dart';
 import '../components/custom_question_widget.dart';
 import 'package:kindainternship/data/list_of_data.dart';
+import 'dart:math' as math;
 
 String imageUrl;
 
@@ -39,16 +40,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<Question>> futureListOfQuestions;
   int nextPage = 2;
+  int prevPage = 1;
   bool isLoading = false;
   var _controller = ScrollController();
+  double max;
 
-  Future _loadData(newPage) async {
-    print('new page');
-    await allQs(context, newPage);
-    print(mainScreenQuestions);
+  Future _loadData(newPage, next) async {
+    await allQs(context, newPage, next);
+//    print(mainScreenQuestions);
     setState(() {
       isLoading = false;
-//      mainScreenQuestions.addAll(['new item']);
     });
   }
 
@@ -72,17 +73,38 @@ class _HomeScreenState extends State<HomeScreen> {
     subjects();
     listOfQuestions(context, 1);
     futureListOfQuestions = fetchQuestion(context, 1);
-    _controller.addListener(() {
+    _controller.addListener(() async {
+      max = MediaQuery.of(context).size.height;
       if (_controller.position.atEdge) {
+        int ese = (_controller.position.pixels / max).floor();
+        if (ese == 0) ese++;
+//        if (_controller.position.pixels > h * ese &&
+//            _controller.position.pixels < (ese + 1) * h) {
+//          mainScreenQuestions.clear();
+//          print('// you are at idk position');
+//        }
         if (_controller.position.pixels == 0) {
+          if (prevPage != null) mainScreenQuestions.clear();
+          await _loadData(prevPage, false);
+          setState(() {
+            isLoading = true;
+          });
+          if (prevPage != null) _controller.jumpTo(30);
           print('// you are at top position');
         } else {
           // you are at bottom position
-          _loadData(nextPage);
+
+          if (nextPage != null) mainScreenQuestions.clear();
+          await _loadData(nextPage, true);
+          if (nextPage != null) _controller.jumpTo(20);
           // start loading data
           setState(() {
             isLoading = true;
           });
+//          if (_controller.position.maxScrollExtent >
+//              MediaQuery.of(context).size.height) {
+//            max = _controller.position.maxScrollExtent;
+//          }
         }
       }
     });
@@ -96,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<CustomQuestionWidget> listOfQuestions(context, newPage) {
-    allQs(context, newPage);
+    allQs(context, newPage, true);
     return mainScreenQuestions;
   }
 
@@ -104,8 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
 //    mainScreenQuestions.clear();
     CustomQuestionWidget element = CustomQuestionWidget(
       id: snapshot.data[index].id,
-      title: snapshot.data[index].title,
-      description: snapshot.data[index].description,
+      title: snapshot.data[index].title.toString(),
+      description: snapshot.data[index].description.toString(),
       pubDate: snapshot.data[index].pubDate,
       likes: snapshot.data[index].likes,
       dislikes: snapshot.data[index].dislikes,
@@ -119,40 +141,69 @@ class _HomeScreenState extends State<HomeScreen> {
     return mainScreenQuestions;
   }
 
-  Future allQs(context, page) async {
+  Future allQs(context, page, next) async {
     dynamic data = await AllQuestions(context: context, page: page).getData();
     if (data != null) {
       List questionsList = data['data']['questions'];
       if (!mounted) return;
       setState(() {
         nextPage = data['data']['next'];
-        for (int i = 0; i < questionsList.length; i++) {
-          if (questionsList[i]['image'].length > 0) {
-            imageUrl = 'http://api.study-share.info' +
-                questionsList[i]['image'][0]['path'];
+        prevPage = data['data']['previous'];
+        if (next) {
+          for (int i = 0; i < questionsList.length; i++) {
+            if (questionsList[i]['image'].length > 0) {
+              imageUrl = 'http://api.study-share.info' +
+                  questionsList[i]['image'][0]['path'];
+            }
+            mainScreenQuestions.add(
+              CustomQuestionWidget(
+                id: questionsList[i]['id'].toInt(),
+                title: questionsList[i]['title'].toString(),
+                description: questionsList[i]['description'].toString(),
+                pubDate: DateTime.parse(questionsList[i]['pub_date_original']
+                    .toString()
+                    .substring(0, 19)),
+                likes: questionsList[i]['likes'],
+                dislikes: questionsList[i]['dislikes'],
+                userVote: questionsList[i]['user_vote'],
+                imageUrl: imageUrl,
+                answerCount: questionsList[i]['answer_count'],
+              ),
+            );
+            imageUrl = null;
           }
-          mainScreenQuestions.add(
-            CustomQuestionWidget(
-              id: questionsList[i]['id'].toInt(),
-              title: questionsList[i]['title'],
-              description: questionsList[i]['description'],
-              pubDate: DateTime.parse(questionsList[i]['pub_date_original']
-                  .toString()
-                  .substring(0, 19)),
-              likes: questionsList[i]['likes'],
-              dislikes: questionsList[i]['dislikes'],
-              userVote: questionsList[i]['user_vote'],
+        } else {
+          questionsList = questionsList.reversed.toList();
+          for (int i = 0; i < questionsList.length; i++) {
+            if (questionsList[i]['image'].length > 0) {
+              imageUrl = 'http://api.study-share.info' +
+                  questionsList[i]['image'][0]['path'];
+            }
+            mainScreenQuestions.insert(
+              0,
+              CustomQuestionWidget(
+                id: questionsList[i]['id'].toInt(),
+                title: questionsList[i]['title'].toString(),
+                description: questionsList[i]['description'].toString(),
+                pubDate: DateTime.parse(questionsList[i]['pub_date_original']
+                    .toString()
+                    .substring(0, 19)),
+                likes: questionsList[i]['likes'],
+                dislikes: questionsList[i]['dislikes'],
+                userVote: questionsList[i]['user_vote'],
 //              userEmail: questionsList[i]['user']['email'],
 //              username: questionsList[i]['user']['username'],
 //              subjectId: questionsList[i]['subject']['id'],
 //              subjectAuthor: questionsList[i]['subject']['author'],
 //              subjectName: questionsList[i]['subject']['name'],
 //              subjectRating: questionsList[i]['subject']['rating'],
-              imageUrl: imageUrl,
-              answerCount: questionsList[i]['answer_count'],
-            ),
-          );
-          imageUrl = null;
+                imageUrl: imageUrl,
+                answerCount: questionsList[i]['answer_count'],
+              ),
+            );
+
+            imageUrl = null;
+          }
         }
       });
     }
@@ -196,9 +247,14 @@ class _HomeScreenState extends State<HomeScreen> {
               if (snapshot.hasData) {
                 return ListView(
                   controller: _controller,
-                  padding: EdgeInsets.only(
-                      left: num10, top: num20, right: num10, bottom: num40),
-                  children: <Widget>[Column(children: mainScreenQuestions)],
+                  padding: EdgeInsets.only(left: num10, right: num10),
+                  children: <Widget>[
+                    SizedBox(height: 30),
+                    Column(children: mainScreenQuestions),
+                    SizedBox(height: 20),
+                    Icon(Icons.arrow_downward, size: 50, color: Colors.grey),
+                    SizedBox(height: 30),
+                  ],
 //                  c: (context, index) {
 //                    return ;
 //                  },

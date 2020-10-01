@@ -208,9 +208,25 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                       'Gallery',
                       style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: () async {
-                      await getImageGallery(context);
-                    },
+                    onPressed: _isButtonDisabled
+                        ? () => print('Gallery')
+                        : () async {
+                            setState(() {
+                              _isButtonDisabled = true;
+                            });
+                            try {
+                              await getImageGallery(context);
+                            } catch (e) {
+                              print(e);
+                            } finally {
+                              setState(() {
+                                _isButtonDisabled = false;
+                              });
+                            }
+                            setState(() {
+                              _isButtonDisabled = false;
+                            });
+                          },
                   ),
                   SizedBox(height: 2),
                   RaisedButton(
@@ -219,9 +235,22 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                       'Camera',
                       style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: () async {
-                      await getImageCamera(context);
-                    },
+                    onPressed: _isButtonDisabled
+                        ? () => print('Camera')
+                        : () async {
+                            setState(() {
+                              _isButtonDisabled = true;
+                            });
+                            try {
+                              await getImageCamera(context);
+                            } catch (e) {
+                              print(e);
+                            } finally {
+                              setState(() {
+                                _isButtonDisabled = false;
+                              });
+                            }
+                          },
                   )
                 ],
               ),
@@ -470,6 +499,19 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+            Container(
+              color: Colors.grey[200],
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                child: Center(
+                  child: Text(
+                    '#no_offensive_content #no_to_inappropriate_content',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
               ),
             ),

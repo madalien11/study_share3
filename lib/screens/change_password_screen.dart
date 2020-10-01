@@ -54,6 +54,34 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Container();
   }
 
+  showAlertDialog(BuildContext context, String detail, bool success) {
+    // set up the button
+    Widget okButton = FlatButton(
+      child: Text("OK"),
+      onPressed: () {
+        // ignore: unnecessary_statements
+        success ? Navigator.pop(context) : null;
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      content: Text(detail),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -236,16 +264,34 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           onPressed: () async {
                             FocusScope.of(context)
                                 .requestFocus(new FocusNode());
-                            currentPassTextController.clear();
-                            newPassTextController.clear();
-                            confirmPassTextController.clear();
-                            print('Save button pressed');
-                            await ChangePassword(
-                                    password: currentPassword,
-                                    password1: newPassword,
-                                    password2: confirmPassword)
-                                .putData();
-                            Navigator.pop(context);
+                            if (currentPassTextController.text.isNotEmpty &&
+                                newPassTextController.text.isNotEmpty &&
+                                confirmPassTextController.text.isNotEmpty) {
+                              final response = await ChangePassword(
+                                      password: currentPassword,
+                                      password1: newPassword,
+                                      password2: confirmPassword)
+                                  .putData();
+                              print(response);
+                              if (response['status'] >= 200 &&
+                                  response['status'] < 203) {
+                                showAlertDialog(context,
+                                    response['detail'] ?? 'null', true);
+                                currentPassTextController.clear();
+                                newPassTextController.clear();
+                                confirmPassTextController.clear();
+                              } else {
+                                setState(() {
+                                  showAlertDialog(
+                                      context,
+                                      response['detail'] ?? 'Invalid data',
+                                      false);
+                                });
+                              }
+                            } else {
+                              showAlertDialog(
+                                  context, 'Please, fill in the fields', false);
+                            }
                           },
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),

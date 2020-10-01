@@ -55,6 +55,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isMySButtonDisabled;
   bool _isLoading = false;
 
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        bool _buttonDisabled = false;
+        return StatefulBuilder(
+          // StatefulBuilder
+          builder: (context, setState) {
+            return AlertDialog(
+              actions: <Widget>[
+                Container(
+                    width: 300,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          "Are you sure you want to log out?",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Expanded(
+                              child: FlatButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                  ),
+                                  color: Color(0xFFFF7A00),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'NO',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                          letterSpacing: 3),
+                                    ),
+                                  )),
+                            ),
+                            SizedBox(width: 20),
+                            Expanded(
+                              child: FlatButton(
+                                  onPressed: () {
+                                    logOutInData();
+                                    Navigator.pushNamedAndRemoveUntil(
+                                        context,
+                                        LoginScreen.id,
+                                        (Route<dynamic> route) => false,
+                                        arguments: {
+                                          'addToken': addTokenInData
+                                        });
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                  ),
+                                  color: _buttonDisabled
+                                      ? Colors.orange[100]
+                                      : Color(0xFFFF7A00),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'YES',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                          letterSpacing: 3),
+                                    ),
+                                  )),
+                            ),
+                          ],
+                        )
+                      ],
+                    ))
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   List<Widget> stars(number) {
     if (starsCalled == 1 && number == 0) {
       star.add(Icon(Icons.star_border, color: Color(0xffFFC90B)));
@@ -109,7 +195,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future allQs(context) async {
     dynamic data = await MyQuestions(context: context).getData();
     print(data);
-    print('hhhhhhhhhhhhhhhhh');
     List questionsList = data['data']['questions'];
     if (!mounted) return;
     setState(() {
@@ -358,7 +443,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                     child: ListTile(
                       title: Text('My subject'),
-                      subtitle: Text('$mySubCount subjects'),
+                      subtitle: Text('${mySubCount ?? "0"} subjects'),
                       trailing: Icon(Icons.chevron_right, size: num30),
                     ),
                   ),
@@ -396,10 +481,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.grey.withOpacity(0.4)),
                   GestureDetector(
                     onTap: () {
-                      logOutInData();
-                      Navigator.pushNamedAndRemoveUntil(context, LoginScreen.id,
-                          (Route<dynamic> route) => false,
-                          arguments: {'addToken': addTokenInData});
+                      _showDialog();
                     },
                     child: ListTile(
                       title: Text('Log out',

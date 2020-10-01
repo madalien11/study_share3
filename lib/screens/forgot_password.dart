@@ -162,19 +162,21 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                                 .validate();
                                         if (response.statusCode >= 200 &&
                                             response.statusCode < 203) {
+                                          String source = Utf8Decoder()
+                                              .convert(response.bodyBytes);
                                           showAlertDialog(
                                               context,
-                                              jsonDecode(response.body)[
-                                                      'detail'] ??
+                                              jsonDecode(source)['detail'] ??
                                                   'null',
                                               true,
                                               email ?? 'null');
                                           emailTextController.clear();
                                         } else {
+                                          String source = Utf8Decoder()
+                                              .convert(response.bodyBytes);
                                           showAlertDialog(
                                               context,
-                                              jsonDecode(response.body)[
-                                                      'detail'] ??
+                                              jsonDecode(source)['detail'] ??
                                                   'Invalid data',
                                               false,
                                               email ?? 'null');

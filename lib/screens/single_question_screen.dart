@@ -444,8 +444,10 @@ class _SingleQuestionScreenState extends State<SingleQuestionScreen> {
                                   if (response.statusCode == 200 ||
                                       response.statusCode == 201 ||
                                       response.statusCode == 202) {
-                                    data = jsonDecode(response.body);
-                                    print(data['data']);
+                                    String source = Utf8Decoder()
+                                        .convert(response.bodyBytes);
+                                    data = jsonDecode(source);
+//                                    print(data['data']);
                                     if (!mounted) return;
                                     setState(() {
                                       userVoteCheck =
@@ -488,7 +490,9 @@ class _SingleQuestionScreenState extends State<SingleQuestionScreen> {
                                   if (response.statusCode == 200 ||
                                       response.statusCode == 201 ||
                                       response.statusCode == 202) {
-                                    data = jsonDecode(response.body);
+                                    String source = Utf8Decoder()
+                                        .convert(response.bodyBytes);
+                                    data = jsonDecode(source);
                                     print(data['data']);
                                     if (!mounted) return;
                                     setState(() {

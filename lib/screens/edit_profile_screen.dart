@@ -206,32 +206,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 .requestFocus(new FocusNode());
                             if (usernameTextController.text.isNotEmpty &&
                                 passwordTextController.text.isNotEmpty) {
-                              try {
-                                final response = await ChangeProfile(
-                                        username: username,
-                                        password: password,
-                                        context: context)
-                                    .putData();
-                                if (response.statusCode >= 200 &&
-                                    response.statusCode < 203) {
+                              final response = await ChangeProfile(
+                                      username: username,
+                                      password: password,
+                                      context: context)
+                                  .putData();
+                              print(response);
+                              if (response['status'] >= 200 &&
+                                  response['status'] < 203) {
+                                showAlertDialog(context,
+                                    response['detail'] ?? 'null', true);
+                                usernameTextController.clear();
+                                passwordTextController.clear();
+                              } else {
+                                setState(() {
                                   showAlertDialog(
                                       context,
-                                      jsonDecode(response.body)['detail'] ??
-                                          'null',
-                                      true);
-                                  usernameTextController.clear();
-                                  passwordTextController.clear();
-                                } else {
-                                  setState(() {
-                                    showAlertDialog(
-                                        context,
-                                        jsonDecode(response.body)['detail'] ??
-                                            'Invalid data',
-                                        false);
-                                  });
-                                }
-                              } catch (e) {
-                                showAlertDialog(context, e.toString(), false);
+                                      response['detail'] ?? 'Invalid data',
+                                      false);
+                                });
                               }
                             } else {
                               showAlertDialog(

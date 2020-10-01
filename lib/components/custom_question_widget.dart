@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kindainternship/screens/single_question_screen.dart';
@@ -37,20 +38,26 @@ class CustomQuestionWidget extends StatefulWidget {
 class _CustomQuestionWidgetState extends State<CustomQuestionWidget> {
   dynamic response;
   dynamic data;
-  bool _isChecked = false;
+//  bool _isChecked = false;
   bool user1 = false;
   bool user2 = false;
   bool user3 = false;
   bool user4 = false;
+  bool user5 = false;
+  bool success = false;
 
   void _showDialog() {
     showDialog(
       context: context,
       builder: (context) {
+        List<int> values = [];
         user1 = false;
         user2 = false;
         user3 = false;
         user4 = false;
+        user5 = false;
+        success = false;
+        bool _buttonDisabled = false;
         return StatefulBuilder(
           // StatefulBuilder
           builder: (context, setState) {
@@ -73,40 +80,80 @@ class _CustomQuestionWidgetState extends State<CustomQuestionWidget> {
                         SizedBox(height: 15),
                         CheckboxListTile(
                           value: user1,
-                          title: Text("Reason1"),
+                          title: Text("Hate speech or symbols"),
                           onChanged: (value) {
+                            if (!mounted) return;
                             setState(() {
                               user1 = value;
+                              if (user1) {
+                                values.add(1);
+                              } else {
+                                values.remove(1);
+                              }
                             });
                           },
                         ),
                         Divider(height: 10),
                         CheckboxListTile(
                           value: user2,
-                          title: Text("Reason2"),
+                          title: Text("Fraud"),
                           onChanged: (value) {
+                            if (!mounted) return;
                             setState(() {
                               user2 = value;
+                              if (user2) {
+                                values.add(2);
+                              } else {
+                                values.remove(2);
+                              }
                             });
                           },
                         ),
                         Divider(height: 10),
                         CheckboxListTile(
                           value: user3,
-                          title: Text("Reason3"),
+                          title: Text("Sexual content"),
                           onChanged: (value) {
+                            if (!mounted) return;
                             setState(() {
                               user3 = value;
+                              if (user3) {
+                                values.add(3);
+                              } else {
+                                values.remove(3);
+                              }
                             });
                           },
                         ),
                         Divider(height: 10),
                         CheckboxListTile(
                           value: user4,
-                          title: Text("Reason4"),
+                          title: Text("Inappropriate content for the subject"),
                           onChanged: (value) {
+                            if (!mounted) return;
                             setState(() {
                               user4 = value;
+                              if (user4) {
+                                values.add(4);
+                              } else {
+                                values.remove(4);
+                              }
+                            });
+                          },
+                        ),
+                        Divider(height: 10),
+                        CheckboxListTile(
+                          value: user5,
+                          title: Text("Others"),
+                          onChanged: (value) {
+                            if (!mounted) return;
+                            setState(() {
+                              user5 = value;
+                              if (user5) {
+                                values.add(5);
+                              } else {
+                                values.remove(5);
+                              }
                             });
                           },
                         ),
@@ -135,13 +182,64 @@ class _CustomQuestionWidgetState extends State<CustomQuestionWidget> {
                                 )),
                             SizedBox(width: 10),
                             FlatButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
+                                onPressed: _buttonDisabled
+                                    ? () => print('Complain')
+                                    : () async {
+                                        if (mounted) {
+                                          setState(() {
+                                            _buttonDisabled = true;
+                                          });
+                                        }
+                                        if (values.length > 0) {
+                                          try {
+                                            response = await Complain(
+                                                    value: values,
+                                                    id: widget.id.toInt(),
+                                                    context: context,
+                                                    t: "q")
+                                                .doIt();
+                                            final result = json.decode(
+                                                response.body.toString());
+                                            if (response.statusCode == 200 ||
+                                                response.statusCode == 201 ||
+                                                response.statusCode == 202) {
+                                              showAlertDialog(context,
+                                                  result['detail'].toString());
+                                              await Future.delayed(Duration(
+                                                  seconds: 1,
+                                                  milliseconds: 200));
+                                              Navigator.pop(context);
+                                              if (mounted) {
+                                                setState(() {
+                                                  success = true;
+                                                });
+                                              }
+                                              Navigator.pop(context);
+                                            }
+                                          } catch (e) {
+                                            print(e);
+                                          } finally {
+                                            if (!success)
+                                              Navigator.pop(context);
+                                          }
+                                        } else {
+                                          showAlertDialog(context,
+                                              "Please, select the reasons");
+                                          await Future.delayed(
+                                              Duration(seconds: 1));
+                                          Navigator.pop(context);
+                                        }
+
+                                        setState(() {
+                                          _buttonDisabled = false;
+                                        });
+                                      },
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30.0),
                                 ),
-                                color: Color(0xFFFF7A00),
+                                color: _buttonDisabled
+                                    ? Colors.orange[100]
+                                    : Color(0xFFFF7A00),
                                 child: Padding(
                                   padding: EdgeInsets.all(8.0),
                                   child: Text(
@@ -165,39 +263,13 @@ class _CustomQuestionWidgetState extends State<CustomQuestionWidget> {
   }
 
   showAlertDialog(BuildContext context, String detail) {
-    // set up the button
-    Widget okButton = FlatButton(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       content: Container(
-        decoration: BoxDecoration(border: Border.all(color: Colors.teal)),
-        child: CheckboxListTile(
-          title: const Text('Woolha.com'),
-          subtitle: const Text('A programming blog'),
-          secondary: const Icon(Icons.web),
-          activeColor: Colors.red,
-          checkColor: Colors.yellow,
-          selected: _isChecked,
-          value: _isChecked,
-          onChanged: (bool value) {
-            setState(() {
-              _isChecked = value;
-            });
-          },
-        ),
+//        decoration: BoxDecoration(border: Border.all(color: Colors.teal)),
+        child: Text(detail, style: TextStyle(fontSize: 16)),
       ),
-      actions: [
-        okButton,
-      ],
     );
 
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -225,26 +297,29 @@ class _CustomQuestionWidgetState extends State<CustomQuestionWidget> {
   bool hasImage = false;
   bool _isButtonDisabled;
   bool isLoading = false;
+  bool isLoadingDialog = false;
 
   Widget img(num150, hasImage) {
     if (hasImage) {
       try {
-        Image.network(widget.imageUrl, height: 150, fit: BoxFit.fitWidth);
-        return CachedNetworkImage(
-          imageUrl: widget.imageUrl,
-          height: num150,
-          fit: BoxFit.fitWidth,
-          progressIndicatorBuilder: (context, url, downloadProgress) =>
-              Container(
-                  child: CircularProgressIndicator(
-                      value: downloadProgress.progress),
-                  padding: EdgeInsets.symmetric(
-                      vertical: 5, horizontal: num150 - 10)),
-          errorWidget: (context, url, error) => Image.asset(
-              'images/imageError.jpg',
-              height: num150,
-              fit: BoxFit.fitWidth),
-        );
+        if (widget.imageUrl != null) {
+          Image.network(widget.imageUrl, height: 150, fit: BoxFit.fitWidth);
+          return CachedNetworkImage(
+            imageUrl: widget.imageUrl,
+            height: num150,
+            fit: BoxFit.fitWidth,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                Container(
+                    child: CircularProgressIndicator(
+                        value: downloadProgress.progress),
+                    padding: EdgeInsets.symmetric(
+                        vertical: 5, horizontal: num150 - 10)),
+            errorWidget: (context, url, error) => Image.asset(
+                'images/imageError.jpg',
+                height: num150,
+                fit: BoxFit.fitWidth),
+          );
+        }
       } catch (err) {
         print(err);
         return Container(height: 10);
@@ -476,7 +551,9 @@ class _CustomQuestionWidgetState extends State<CustomQuestionWidget> {
                               if (response.statusCode == 200 ||
                                   response.statusCode == 201 ||
                                   response.statusCode == 202) {
-                                data = jsonDecode(response.body);
+                                String source =
+                                    Utf8Decoder().convert(response.bodyBytes);
+                                data = jsonDecode(source);
                                 print(data['data']);
                                 if (!mounted) return;
                                 setState(() {
@@ -517,7 +594,9 @@ class _CustomQuestionWidgetState extends State<CustomQuestionWidget> {
                               if (response.statusCode == 200 ||
                                   response.statusCode == 201 ||
                                   response.statusCode == 202) {
-                                data = jsonDecode(response.body);
+                                String source =
+                                    Utf8Decoder().convert(response.bodyBytes);
+                                data = jsonDecode(source);
                                 print(data['data']);
                                 if (!mounted) return;
                                 setState(() {

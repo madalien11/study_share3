@@ -263,10 +263,11 @@ class _ForgotPasswordChangeState extends State<ForgotPasswordChange> {
                                               LoginScreen.id,
                                               (Route<dynamic> route) => false);
                                         } else {
+                                          String source = Utf8Decoder()
+                                              .convert(response.bodyBytes);
                                           showAlertDialog(
                                               context,
-                                              jsonDecode(response.body)[
-                                                      'detail'] ??
+                                              jsonDecode(source)['detail'] ??
                                                   'Invalid data');
                                         }
                                       } catch (e) {

@@ -343,9 +343,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                         .register();
                                     if (response.statusCode >= 200 &&
                                         response.statusCode < 203) {
+                                      String source = Utf8Decoder()
+                                          .convert(response.bodyBytes);
                                       showAlertDialog(
                                           context,
-                                          jsonDecode(response.body)['detail'] ??
+                                          jsonDecode(source)['detail'] ??
                                               'null',
                                           true,
                                           email ?? 'null');
@@ -355,10 +357,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                       confirmTextController.clear();
                                     } else {
                                       setState(() {
+                                        String source = Utf8Decoder()
+                                            .convert(response.bodyBytes);
                                         showAlertDialog(
                                             context,
-                                            jsonDecode(
-                                                    response.body)['detail'] ??
+                                            jsonDecode(source)['detail'] ??
                                                 'Invalid username', // НО ТУТ Я САМ ХАРДКОДОМ НАПИСАЛ, БЭК КАЖЕТСЯ ЮЗЕРНЕЙМНЫН СЛУЧАЙЫНДА ТЕКСТ ОШИБКИ НЕ ВЫДАЕТ
                                             false,
                                             email ?? 'null');
